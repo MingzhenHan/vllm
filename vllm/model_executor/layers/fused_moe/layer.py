@@ -1320,7 +1320,7 @@ class FusedMoE(torch.nn.Module):
         # All-ones weights
         topk_weights = torch.ones(
             (num_tokens, top_k),
-            dtype=hidden_states.dtype,
+            dtype=torch.float32,
             device=hidden_states.device,
         )
 
