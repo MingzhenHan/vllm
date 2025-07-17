@@ -1,0 +1,6 @@
+--2025-07-16 17:25:52--  https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/35/f0/e213ce091ed9b9af2a1f0755e9d39f9ccec34ab281cd4ca60d70f6479ba4?filename=ShareGPT_V3_unfiltered_cleaned_split.json
+Resolving cdn-lfs-cn-1.modelscope.cn (cdn-lfs-cn-1.modelscope.cn)... 8.160.215.144, 8.160.215.145, 8.160.215.143, ...
+Connecting to cdn-lfs-cn-1.modelscope.cn (cdn-lfs-cn-1.modelscope.cn)|8.160.215.144|:443... connected.
+HTTP request sent, awaiting response... 403 Forbidden
+2025-07-16 17:25:52 ERROR 403: Forbidden.
+
