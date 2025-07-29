@@ -433,6 +433,14 @@ async def benchmark(
             return await request_func(request_func_input=request_func_input, pbar=pbar)
 
     benchmark_start_time = time.perf_counter()
+
+    from datetime import datetime
+
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[
+        :-3
+    ]  # 截断最后三位，保留毫秒
+    print(f"Current time (ms): {current_time}")
+
     tasks: list[asyncio.Task] = []
 
     rps_change_events = []
@@ -507,6 +515,7 @@ async def benchmark(
         pbar.close()
 
     benchmark_duration = time.perf_counter() - benchmark_start_time
+    print("benchmark_start_time:", benchmark_start_time)
 
     metrics, actual_output_lens = calculate_metrics(
         input_requests=input_requests,

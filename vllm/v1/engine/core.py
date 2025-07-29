@@ -232,6 +232,7 @@ class EngineCore:
         Returns tuple of outputs and a flag indicating whether the model
         was executed.
         """
+        start_time = time.perf_counter()  # 记录开始时间
 
         # Check for any requests remaining in the scheduler - unfinished,
         # or finished and not yet removed from the batch.
@@ -241,6 +242,9 @@ class EngineCore:
         model_output = self.execute_model(scheduler_output)
         engine_core_outputs = self.scheduler.update_from_output(
             scheduler_output, model_output)  # type: ignore
+
+        elapsed = time.perf_counter() - start_time
+        print(f"[Performance] step() executed in {elapsed:.6f} seconds")
 
         return (engine_core_outputs,
                 scheduler_output.total_num_scheduled_tokens > 0)

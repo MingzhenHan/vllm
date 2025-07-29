@@ -9,6 +9,8 @@ from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any, Optional, Union
 
+import pynvml
+
 from vllm.config import VllmConfig
 from vllm.distributed.kv_events import EventPublisherFactory, KVEventBatch
 from vllm.distributed.kv_transfer.kv_connector.factory import (
@@ -63,6 +65,11 @@ class Scheduler(SchedulerInterface):
         num_prefill_requests = 0
         num_decode_tokens = 0
         num_decode_requests = 0
+
+        pynvml.nvmlInit()
+        self.handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        self.freq_switch = True
+        self.freq_state = 0
 
         # include_finished_set controls whether a separate set of finished
         # request ids should be included in the EngineCoreOutputs returned
@@ -555,8 +562,23 @@ class Scheduler(SchedulerInterface):
             req_to_new_block_ids,
         )
 
-        logger.info("num_scheduled_tokens:%s", num_scheduled_tokens)
-        
+        logger.info("num_scheduled_tokens values: %s, %d",
+                    list(num_scheduled_tokens.values()),
+                    total_num_scheduled_tokens)
+        if total_num_scheduled_tokens > 32 and self.freq_state != 1:
+            pynvml.nvmlDeviceResetGpuLockedClocks(self.handle)
+            self.freq_state = 1
+            print("GPU locked clocks Reset")
+        if total_num_scheduled_tokens <= 32 and self.freq_state != 2:
+            pynvml.nvmlDeviceSetGpuLockedClocks(self.handle, 1155, 1155)
+            self.freq_state = 2
+            print("GPU locked clocks set to 1155 MHz")
+        # if self.freq_switch:
+        #     pynvml.nvmlDeviceSetGpuLockedClocks(self.handle, 1155, 1155)
+        # else:
+        #     pynvml.nvmlDeviceSetGpuLockedClocks(self.handle, 810, 810)
+        # self.freq_switch = not self.freq_switch
+
         scheduler_output = SchedulerOutput(
             scheduled_new_reqs=new_reqs_data,
             scheduled_cached_reqs=cached_reqs_data,
